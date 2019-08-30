@@ -11,7 +11,7 @@ import (
 // The pizza ontology is from https://github.com/owlcs/pizza-ontology
 // which was converted to OWL-Functional with Protègè (https://protege.stanford.edu/)
 func main() {
-	f, err := os.Open("pizza-functional.owl")
+	f, err := os.Open("D:/PROJECT/owl/gofp/example/pizza/pizza-functional.owl")
 	if err != nil {
 		panic(err)
 	}
