@@ -3,9 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/shful/gofp"
-	"io"
-
-	"github.com/knakk/rdf"
 	"github.com/urfave/cli"
 	"os"
 	"path/filepath"
@@ -58,17 +55,19 @@ func main() {
 			fmt.Println("Open source file error!", err)
 			return nil
 		}
+		defer f.Close()
 		if srcExt == ".owl" {
-			dec := rdf.NewTripleDecoder(f, rdf.Turtle)
-			for triple, err := dec.Decode(); err != io.EOF; triple, err = dec.Decode() {
-				fmt.Println(triple)
-			}
-			o, err :=gofp.OntologyFromReader(f,filepath.Base(src))
+			//dec := rdf.NewTripleDecoder(f, rdf.Turtle)
+			//for triple, err := dec.Decode(); err != io.EOF; triple, err = dec.Decode() {
+			//	fmt.Println(triple)
+			//}
+
+			_, err :=gofp.OntologyOwlFromReader(f,filepath.Base(src))
 			if err!=nil{
-				fmt.Println("Open source file error!", err)
+				fmt.Println(" Parse OntologyOwlFromReader error!", err)
 				return nil
 			}
-			fmt.Println(err, o.About())
+		//	fmt.Println(err, o.About())
 
 		} else if srcExt == ".xml" {
 

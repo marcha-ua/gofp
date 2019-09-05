@@ -28,12 +28,13 @@ package gofp
 //where axiomAnnotations := { Annotation }
 
 import (
-	"io"
-
+	"encoding/xml"
+	"fmt"
 	"github.com/shful/gofp/owlfunctional/ontologies"
 	"github.com/shful/gofp/owlfunctional/parser"
 	"github.com/shful/gofp/parsehelper"
 	"github.com/shful/gofp/storedefaults"
+	"io"
 )
 
 // OntologyFromReader parses an owl-functional file contents into an Ontology struct.
@@ -132,3 +133,87 @@ func parsePrefixTo(prefixes map[string]string, p *parser.Parser) (err error) {
 	prefixes[prefix] = prefixVal
 	return
 }
+
+func OntologyOwlFromReader(r io.Reader, sourceName string) (ontology *ontologies.Ontology, err error) {
+
+	//p := parser.NewParser(r, sourceName)
+	k := storedefaults.NewDefaultK()
+
+	// In this convenience method, by default, accept implicit declarations which is OWL standard
+	// When true, any declaration needs to be explicit written before usage, or the parser stops with a error.
+	k.ExplicitDecls = false
+
+	rc := ontologies.StoreConfig{
+		AxiomStore: k,
+		Decls:      k,
+		DeclStore:  k,
+	}
+	ontology, err = OntologyOwlFromParser(r, rc)
+	if err != nil {
+		return
+	}
+
+	// When parsing into the default structures, we can set the convenience attribute Ontology.K
+	// See package "store" for parsing into custom structures instead:
+	//ontology.K = k
+
+	return
+}
+
+	func OntologyOwlFromParser(r io.Reader, rc ontologies.StoreConfig) (ontology *ontologies.Ontology, err error) {
+		//prefixes := map[string]string{}
+
+	decoder := xml.NewDecoder(r)
+//	total := 0
+	for {
+		token, _ := decoder.Token()
+		if token == nil {
+			break
+		}
+		//fmt.Println(token)
+		switch startElement := token.(type) {
+		case xml.StartElement:
+			if startElement.Name.Local == "entry" {
+				// do what you need to do for each entry below
+			}
+			fmt.Println("startElement ", startElement)
+		case xml.EndElement:
+			fmt.Println("EndElement ", startElement)
+		case xml.Attr:
+			fmt.Println("Attr ", startElement)
+		case xml.Comment:
+			fmt.Println("Comment ", startElement)
+		case xml.Name:
+			fmt.Println("Name ", startElement)
+
+		case xml.CharData:
+			str := string([]byte(startElement))
+			fmt.Println("CharData ", str)
+
+		}
+
+	}
+		//for {
+		//	tok, lit, pos := p.ScanIgnoreWSAndComment()
+		//	switch tok {
+		//	case parser.Prefix:
+		//		p.Unscan()
+		//		if err = parsePrefixTo(prefixes, p); err != nil {
+		//			err = pos.Errorf("Parsing prefix raised:%v", err)
+		//			return
+		//		}
+		//	case parser.Ontology:
+		//		p.Unscan()
+		//		ontology = ontologies.NewOntology(prefixes, rc)
+		//		if err = ontology.Parse(p); err != nil {
+		//			return
+		//		}
+		//	case parser.EOF:
+		//		return
+		//	default:
+		//		err = pos.ErrorfUnexpectedToken(tok, lit, "Prefix or Ontology")
+		//		return
+		//	}
+		//}
+return
+	}
